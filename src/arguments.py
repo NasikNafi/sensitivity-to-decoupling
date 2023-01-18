@@ -52,12 +52,12 @@ parser.add_argument(
 parser.add_argument(
     '--num_processes',
     type=int,
-    default=64,
+    default=16,
     help='how many training CPU processes to use')
 parser.add_argument(
     '--num_steps',
     type=int,
-    default=256,
+    default=128,
     help='number of forward steps in A2C')
 parser.add_argument(
     '--ppo_epoch',
@@ -67,7 +67,7 @@ parser.add_argument(
 parser.add_argument(
     '--num_mini_batch',
     type=int,
-    default=16,
+    default=32,
     help='number of batches for ppo')
 parser.add_argument(
     '--clip_param',
@@ -77,18 +77,23 @@ parser.add_argument(
 parser.add_argument(
     '--log_interval',
     type=int,
-    default=10,
+    default=2,
     help='log interval, one log per n updates')
 parser.add_argument(
     '--num_env_steps',
     type=int,
-    default=25e6,
+    default=500000,
     help='number of environment steps to train')
 parser.add_argument(
     '--env_name',
     type=str,
-    default='coinrun',
+    default='MiniGrid-DistShift1-v0',
     help='environment to train on')
+parser.add_argument(
+    '--test_env_name',
+    type=str,
+    default='MiniGrid-DistShift2-v0',
+    help='environment variant to test on')
 parser.add_argument(
     '--separation',
     default='apdac',

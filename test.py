@@ -8,19 +8,30 @@ from baselines.common.vec_env import (
     VecNormalize
 )
 
+from src.envs import make_minigrid_env
+from src.envs import VecPyTorchMinigrid
+from stable_baselines3.common.vec_env import VecMonitor as SB3VecMonitor
+from stable_baselines3.common.vec_env import VecNormalize as SB3VecNormalize
+from stable_baselines3.common.vec_env import DummyVecEnv as SB3DummyVecEnv
+
 from src.envs import VecPyTorchProcgen
 
 
 def evaluate(args, actor_critic, device):
     actor_critic.eval()
 
-    # Sample Levels From the Full Distribution 
-    venv = ProcgenEnv(num_envs=1, env_name=args.env_name, \
-        num_levels=0, start_level=0, distribution_mode=args.distribution_mode)
-    venv = VecExtractDictObs(venv, "rgb")
-    venv = VecMonitor(venv=venv, filename=None, keep_buf=100)
-    venv = VecNormalize(venv=venv, ob=False)
-    eval_envs = VecPyTorchProcgen(venv, device)
+    if 'MiniGrid' in args.env_name:
+        venv = SB3DummyVecEnv([make_minigrid_env(args.test_env_name) for _ in range(args.num_processes)])
+        venv = SB3VecNormalize(SB3VecMonitor(venv), norm_reward=True, norm_obs=False, clip_reward=1.)
+        eval_envs = VecPyTorchMinigrid(venv, device)
+    else:
+        # Sample Levels From the Full Distribution 
+        venv = ProcgenEnv(num_envs=1, env_name=args.env_name, \
+            num_levels=0, start_level=0, distribution_mode=args.distribution_mode)
+        venv = VecExtractDictObs(venv, "rgb")
+        venv = VecMonitor(venv=venv, filename=None, keep_buf=100)
+        venv = VecNormalize(venv=venv, ob=False)
+        eval_envs = VecPyTorchProcgen(venv, device)
 
     eval_episode_rewards = []
     obs = eval_envs.reset()
