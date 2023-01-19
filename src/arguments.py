@@ -57,12 +57,12 @@ parser.add_argument(
 parser.add_argument(
     '--num_steps',
     type=int,
-    default=128,
+    default=256,
     help='number of forward steps in A2C')
 parser.add_argument(
     '--ppo_epoch',
     type=int,
-    default=1,
+    default=1, 
     help='number of ppo epochs')
 parser.add_argument(
     '--num_mini_batch',
@@ -77,7 +77,7 @@ parser.add_argument(
 parser.add_argument(
     '--log_interval',
     type=int,
-    default=2,
+    default=1,
     help='log interval, one log per n updates')
 parser.add_argument(
     '--num_env_steps',
