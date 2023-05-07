@@ -52,22 +52,22 @@ parser.add_argument(
 parser.add_argument(
     '--num_processes',
     type=int,
-    default=16,
+    default=4,
     help='how many training CPU processes to use')
 parser.add_argument(
     '--num_steps',
     type=int,
-    default=256,
+    default=2048,
     help='number of forward steps in A2C')
 parser.add_argument(
     '--ppo_epoch',
     type=int,
-    default=1, 
+    default=5, 
     help='number of ppo epochs')
 parser.add_argument(
     '--num_mini_batch',
     type=int,
-    default=32,
+    default=8,
     help='number of batches for ppo')
 parser.add_argument(
     '--clip_param',
@@ -82,7 +82,7 @@ parser.add_argument(
 parser.add_argument(
     '--num_env_steps',
     type=int,
-    default=500000,
+    default=1e6,
     help='number of environment steps to train')
 parser.add_argument(
     '--env_name',
@@ -96,7 +96,7 @@ parser.add_argument(
     help='environment variant to test on')
 parser.add_argument(
     '--separation',
-    default='apdac',
+    default='none',
     choices=['none', 'early', 'late', 'full', 'full_daac'],
     help='extent of decoupling/separation to use')
 parser.add_argument(

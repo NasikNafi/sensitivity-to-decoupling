@@ -7,19 +7,28 @@ import hyperparams as hps
 from test import evaluate
 from procgen import ProcgenEnv
 
-from baselines import logger
-from baselines.common.vec_env import (
-    VecExtractDictObs,
-    VecMonitor,
-    VecNormalize,
-    DummyVecEnv
-)
+# from baselines import logger
+# from baselines.common.vec_env import (
+#     VecExtractDictObs,
+#     VecMonitor,
+#     VecNormalize,
+#     DummyVecEnv
+# )
 
-from src.envs import make_minigrid_env
-from src.envs import VecPyTorchMinigrid
 from stable_baselines3.common.vec_env import VecMonitor as SB3VecMonitor
 from stable_baselines3.common.vec_env import VecNormalize as SB3VecNormalize
 from stable_baselines3.common.vec_env import DummyVecEnv as SB3DummyVecEnv
+
+# For Minigrid
+# from src.envs import make_minigrid_env
+# from src.envs import VecPyTorchMinigrid
+
+# For Crafter
+from src.envs import make_crafter_env
+from src.envs import VecPyTorchCrafter
+
+# For Procgen
+from src.envs import VecPyTorchProcgen
 
 from src import algo, utils
 from src.arguments import parser
@@ -27,8 +36,6 @@ from src.model import PPOnet, IDAACnet, APDACnet, \
     LinearOrderClassifier, NonlinearOrderClassifier
 from src.storage import DAACRolloutStorage, \
     IDAACRolloutStorage, RolloutStorage
-from src.envs import VecPyTorchProcgen
-
 
 def train(args):
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -54,13 +61,18 @@ def train(args):
     device = torch.device("cuda:0" if args.cuda else "cpu")
 
     log_file = '-{}-{}-s{}'.format(args.env_name, args.separation, args.seed)
-    logger.configure(dir=args.log_dir, format_strs=['csv', 'stdout'], log_suffix=log_file)
+    # logger.configure(dir=args.log_dir, format_strs=['csv', 'stdout'], log_suffix=log_file)
     print("\nLog File: ", log_file)
 
-    if 'MiniGrid' in args.env_name:
-        venv = SB3DummyVecEnv([make_minigrid_env(args.env_name) for _ in range(args.num_processes)])
+    # if 'MiniGrid' in args.env_name:
+    #     venv = SB3DummyVecEnv([make_minigrid_env(args.env_name) for _ in range(args.num_processes)])
+    #     venv = SB3VecNormalize(SB3VecMonitor(venv), norm_reward=True, norm_obs=False, clip_reward=1.)
+    #     envs = VecPyTorchMinigrid(venv, device)
+    
+    if 'crafter' in args.env_name:
+        venv = SB3DummyVecEnv([make_crafter_env(log_file) for _ in range(args.num_processes)])
         venv = SB3VecNormalize(SB3VecMonitor(venv), norm_reward=True, norm_obs=False, clip_reward=1.)
-        envs = VecPyTorchMinigrid(venv, device)
+        envs = VecPyTorchCrafter(venv, device)
     else:
         venv = ProcgenEnv(num_envs=args.num_processes, env_name=args.env_name, \
             num_levels=args.num_levels, start_level=args.start_level, \
@@ -248,17 +260,17 @@ def train(args):
                 .format(len(episode_rewards), np.mean(episode_rewards),
                         np.median(episode_rewards)))
 
-            # Log training stats
-            logger.logkv("train/total_num_steps", total_num_steps)
-            logger.logkv("train/mean_episode_reward", np.mean(episode_rewards))
-            logger.logkv("train/median_episode_reward", np.median(episode_rewards))
+            # # Log training stats
+            # logger.logkv("train/total_num_steps", total_num_steps)
+            # logger.logkv("train/mean_episode_reward", np.mean(episode_rewards))
+            # logger.logkv("train/median_episode_reward", np.median(episode_rewards))
 
-            # Log eval stats (on the full distribution of levels)
-            eval_episode_rewards = evaluate(args, actor_critic, device)
-            logger.logkv("test/mean_episode_reward", np.mean(eval_episode_rewards))
-            logger.logkv("test/median_episode_reward", np.median(eval_episode_rewards))
+            # # Log eval stats (on the full distribution of levels)
+            # eval_episode_rewards = evaluate(args, actor_critic, device)
+            # logger.logkv("test/mean_episode_reward", np.mean(eval_episode_rewards))
+            # logger.logkv("test/median_episode_reward", np.median(eval_episode_rewards))
 
-            logger.dumpkvs()
+            # logger.dumpkvs()
 
 
 if __name__ == "__main__":

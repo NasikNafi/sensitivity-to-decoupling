@@ -188,7 +188,7 @@ class ResNetBase(NNBase):
         self.flatten = Flatten()
         self.relu = nn.ReLU()
 
-        self.fc = init_relu_(nn.Linear(1568, hidden_size))
+        self.fc = init_relu_(nn.Linear(2048, hidden_size))
         self.critic_linear = init_(nn.Linear(hidden_size, 1))
 
         apply_init_(self.modules())
@@ -238,8 +238,8 @@ class ResNetBaseWithAttnEarly(NNBase):
         self.flatten = Flatten()
         self.relu = nn.ReLU()
 
-        self.fcv = init_relu_(nn.Linear(1568, hidden_size))
-        self.fcp = init_relu_(nn.Linear(1568, hidden_size))
+        self.fcv = init_relu_(nn.Linear(2048, hidden_size))
+        self.fcp = init_relu_(nn.Linear(2048, hidden_size))
 
         self.critic_linear = init_(nn.Linear(hidden_size, 1))
 
@@ -309,8 +309,8 @@ class ResNetBaseWithAttnLate(NNBase):
         self.flatten = Flatten()
         self.relu = nn.ReLU()
 
-        self.fcv = init_relu_(nn.Linear(1568, hidden_size))
-        self.fcp = init_relu_(nn.Linear(1568, hidden_size))
+        self.fcv = init_relu_(nn.Linear(2048, hidden_size))
+        self.fcp = init_relu_(nn.Linear(2048, hidden_size))
 
         self.critic_linear = init_(nn.Linear(hidden_size, 1))
 
@@ -378,7 +378,7 @@ class PolicyResNetBase(NNBase):
         self.flatten = Flatten()
         self.relu = nn.ReLU()
 
-        self.fc = init_relu_(nn.Linear(1568, hidden_size))
+        self.fc = init_relu_(nn.Linear(2048, hidden_size))
         self.critic_linear = init_(nn.Linear(hidden_size + num_actions, 1))
 
         apply_init_(self.modules())
@@ -428,7 +428,7 @@ class ValueResNet(NNBase):
         self.flatten = Flatten()
         self.relu = nn.ReLU()
 
-        self.fc = init_relu_(nn.Linear(1568, hidden_size))
+        self.fc = init_relu_(nn.Linear(2048, hidden_size))
         self.critic_linear = init_(nn.Linear(hidden_size, 1))
 
         apply_init_(self.modules())

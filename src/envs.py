@@ -3,8 +3,11 @@ import torch
 import random
 import numpy as np 
 from gym.spaces.box import Box
-from baselines.common.vec_env import VecEnvWrapper
-from gym_minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
+# from baselines.common.vec_env import VecEnvWrapper
+# from gym_minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
+
+import crafter
+from stable_baselines3.common.vec_env.base_vec_env import VecEnv, VecEnvStepReturn, VecEnvWrapper
 
 class VecPyTorchProcgen(VecEnvWrapper):
     def __init__(self, venv, device):
@@ -45,33 +48,86 @@ class VecPyTorchProcgen(VecEnvWrapper):
 
 
 
-def make_minigrid_env(id: str):
-    """
-    Utility function for multiprocessed env.
-    :param id: (str) the environment ID
-    """
+# def make_minigrid_env(id: str):
+#     """
+#     Utility function for multiprocessed env.
+#     :param id: (str) the environment ID
+#     """
 
-    def _init():
-        env = gym.make(id)
-        env = RGBImgPartialObsWrapper(env)
-        env = ImgObsWrapper(env)
-        return env
+#     def _init():
+#         env = gym.make(id)
+#         env = RGBImgPartialObsWrapper(env)
+#         env = ImgObsWrapper(env)
+#         return env
 
-    return _init
+#     return _init
         
 
-class VecPyTorchMinigrid(VecEnvWrapper):
+# class VecPyTorchMinigrid(VecEnvWrapper):
+#     def __init__(self, venv, device):
+#         """
+#         Environment wrapper that returns tensors (for obs and reward)
+#         """
+#         super(VecPyTorchMinigrid, self).__init__(venv)
+#         self.device = device
+
+#         self.observation_space = Box(
+#             self.observation_space.low[0, 0, 0],
+#             self.observation_space.high[0, 0, 0], 
+#             [3, 56, 56],
+#             dtype=self.observation_space.dtype)
+
+#     def reset(self):
+#         obs = self.venv.reset()
+#         if obs.shape[1] != 3:
+#             obs = obs.transpose(0, 3, 1, 2)
+#         obs = torch.from_numpy(obs).float().to(self.device) / 255.
+#         return obs
+
+#     def step_async(self, actions):
+#         if isinstance(actions, torch.LongTensor) or len(actions.shape) > 1:
+#             # Squeeze the dimension for discrete actions
+#             actions = actions.squeeze(1)
+#         actions = actions.cpu().numpy()
+#         self.venv.step_async(actions)
+
+#     def step_wait(self):
+#         obs, reward, done, info = self.venv.step_wait()
+#         if obs.shape[1] != 3:
+#             obs = obs.transpose(0, 3, 1, 2)
+#         obs = torch.from_numpy(obs).float().to(self.device) / 255.
+#         reward = torch.from_numpy(reward).unsqueeze(dim=1).float()
+#         return obs, reward, done, info
+
+
+def make_crafter_env(file_dir: str):
+    """
+    :param file_dir: (str) variable file directory for saving json logs
+    """
+    def _init():
+        env = gym.make('CrafterReward-v1') #Or CrafterNoReward-v1 
+        env = crafter.Recorder(
+        env, './crafter_logs/' + file_dir,
+        save_stats=True,
+        save_video=False,
+        save_episode=False,
+        )
+        return env
+    
+    return _init
+
+class VecPyTorchCrafter(VecEnvWrapper):
     def __init__(self, venv, device):
         """
         Environment wrapper that returns tensors (for obs and reward)
         """
-        super(VecPyTorchMinigrid, self).__init__(venv)
+        super(VecPyTorchCrafter, self).__init__(venv)
         self.device = device
 
         self.observation_space = Box(
             self.observation_space.low[0, 0, 0],
             self.observation_space.high[0, 0, 0], 
-            [3, 56, 56],
+            [3, 64, 64],
             dtype=self.observation_space.dtype)
 
     def reset(self):
