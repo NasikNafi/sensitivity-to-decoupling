@@ -4,7 +4,7 @@ import numpy as np
 from collections import deque
 
 import hyperparams as hps
-from test import evaluate
+# from test import evaluate
 from procgen import ProcgenEnv
 
 # from baselines import logger

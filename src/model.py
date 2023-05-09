@@ -367,7 +367,7 @@ class PolicyResNetBase(NNBase):
     """
     Residual Network
     """
-    def __init__(self, num_inputs, hidden_size=256, channels=[16,32,32], num_actions=15):
+    def __init__(self, num_inputs, hidden_size=256, channels=[16,32,32], num_actions=17):
         super(PolicyResNetBase, self).__init__(hidden_size)
         self.num_actions = num_actions
 
